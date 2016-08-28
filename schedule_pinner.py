@@ -6,7 +6,7 @@ import re, bs4, os, datetime
 FALL_2016_END = datetime.datetime(2016, 12, 3, 0, 0, 0)
 FALL_2016_START_YEAR = 2016
 FALL_2016_START_MONTH = 8
-FALL_2016_START_DAY = 24
+FALL_2016_START_DAY = 23 # this is intended set to be 1 day less than instruction date
 PRODUCT_ID = '-//M & Z Product//Berkeley iCal//EN'
 
 all_abbr = {
@@ -308,9 +308,14 @@ def parse_time(time):
     t_end = contents[3].split(':')
     t_start_parsed = parse_hour_minute(t_start)
     t_end_parsed = parse_hour_minute(t_end)
-    dtstart = datetime.datetime(FALL_2016_START_YEAR, FALL_2016_START_MONTH, FALL_2016_START_DAY,
+    t_start_adjusted = datetime.date(2070, 1, 1)
+    for i in weekdays:
+        temp = next_weekday(datetime.date(FALL_2016_START_YEAR, FALL_2016_START_MONTH, FALL_2016_START_DAY), weekday_to_num(i))
+        if temp < t_start_adjusted:
+            t_start_adjusted = temp
+    dtstart = datetime.datetime(t_start_adjusted.year, t_start_adjusted.month, t_start_adjusted.day,
                                 t_start_parsed[0], t_start_parsed[1], 0)
-    dtend = datetime.datetime(FALL_2016_START_YEAR, FALL_2016_START_MONTH, FALL_2016_START_DAY,
+    dtend = datetime.datetime(t_start_adjusted.year, t_start_adjusted.month, t_start_adjusted.day,
                               t_end_parsed[0], t_end_parsed[1], 0)
     return (dtstart, dtend, weekdays)
 
@@ -322,6 +327,17 @@ def parse_hour_minute(t):
         hour += 12
     return (hour, minutes)
 
+def weekday_to_num(weekdaystring):
+    if weekdaystring == "mo":
+        return 0
+    if weekdaystring == "tu":
+        return 1
+    if weekdaystring == "we":
+        return 2
+    if weekdaystring == "th":
+        return 3
+    if weekdaystring == "fr":
+        return 4
 
 def round_time(hour, minutes):
     minutes = (minutes + 1) / 5 * 5
@@ -329,6 +345,12 @@ def round_time(hour, minutes):
         hour += 1
         minutes = 0
     return (hour, minutes)
+
+def next_weekday(d, weekday):
+    days_ahead = weekday - d.weekday()
+    if days_ahead <= 0: # Target day already happened this week
+        days_ahead += 7
+    return d + datetime.timedelta(days_ahead)
 
 
 def write_to_file(calendar, path):
