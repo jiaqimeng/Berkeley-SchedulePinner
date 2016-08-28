@@ -3,6 +3,10 @@ import re, bs4, os, datetime
 
 # return a .ics formatted string
 FALL_2016_END = datetime.datetime(2016, 12, 3, 0, 0, 0)
+FALL_2016_START_YEAR = 2016
+FALL_2016_START_MONTH = 8
+FALL_2016_START_DAY = 24
+PRODUCT_ID = '-//M & Z Product//Berkeley iCal//EN'
 
 
 def display(cal):
@@ -12,19 +16,19 @@ def display(cal):
 def create_event(uid, dtstart, dtend, location, rule, summary):
     event = Event()
     event['uid'] = uid
-    event['dtstart'] = dtstart
-    event['dtend'] = dtend
+    event.add('dtstart', dtstart)
+    event.add('dtend', dtend)
     event['location'] = location
     event['summary'] = summary
     print(location)
     print(summary)
     print(rule)
-    event.add('rrule', create_event_rule(rule[0], rule[1], rule[2], rule[3], rule[4]))
+    event.add('rrule', create_event_rule(rule[0], rule[1], rule[2], rule[3]))
     return event
 
 
-def create_event_rule(frequency, byday, bymonth, until, weekdaystarts):
-    return {'freq': frequency, 'byday': byday, 'bymonth': bymonth,
+def create_event_rule(frequency, byday, until, weekdaystarts):
+    return {'freq': frequency, 'byday': byday,
             'until': until, 'WKST': weekdaystarts}
 
 
@@ -90,6 +94,46 @@ def scrap_data():
             courses[subject + " " + number + " " + component] = this_course
     return courses
 
+def parse_time(time):
+    contents = time.split()
+    weekdays = []
+    contents_weekdays = contents[0]
+    for i in range(len(contents_weekdays)):
+        if contents_weekdays[i] == 'T':
+            if i < len(contents_weekdays)-1 and contents_weekdays[i+1] == 'h':
+                weekdays.append('th')
+            else:
+                weekdays.append('tu')
+        if contents_weekdays[i] == 'M':
+            weekdays.append('mo')
+        if contents_weekdays[i] == 'W':
+            weekdays.append('we')
+        if contents_weekdays[i] == 'F':
+            weekdays.append('fr')
+    t_start = contents[1].split(':')
+    t_end = contents[3].split(':')
+    t_start_parsed = parse_hour_minute(t_start)
+    t_end_parsed = parse_hour_minute(t_end)
+    dtstart = datetime.datetime(FALL_2016_START_YEAR, FALL_2016_START_MONTH, FALL_2016_START_DAY, 
+        t_start_parsed[0], t_start_parsed[1], 0)
+    dtend = datetime.datetime(FALL_2016_START_YEAR, FALL_2016_START_MONTH, FALL_2016_START_DAY, 
+        t_end_parsed[0], t_end_parsed[1], 0)
+    return (dtstart, dtend, weekdays)
+
+def parse_hour_minute(t):
+    am_pm = t[1][len(t)-2:len(t)]
+    hour, minutes = round_time(int(t[0]), int(t[1][0:2]))
+    if am_pm == "pm" and hour != 12:
+        hour += 12
+    return (hour, minutes)
+
+def round_time(hour, minutes):
+    minutes = (minutes + 1) / 5 * 5
+    if minutes == 60:
+        hour += 1
+        minutes = 0
+    return (hour, minutes)
+
 def write_to_file(calendar, path):
     f = open(path, "w")
     f.write(calendar.to_ical())
@@ -97,18 +141,21 @@ def write_to_file(calendar, path):
 
 def main():
     cal = Calendar()
+    cal['version'] = '2.0'
+    cal.add('prodid', PRODUCT_ID)
     cal.add_component(create_default_timezone())
     uid = 1
     for course, info in scrap_data().iteritems():
         summary = course 
         location = info["location"]
-        dtstart = '19701101T020000'
-        dtend = '19701101T020000'
-        rule = ['weekly', ['tu', 'th'], 3, FALL_2016_END, 'su']
+        time_parsed = parse_time(info["time"])
+        dtstart = time_parsed[0]
+        dtend = time_parsed[1]
+        rule = ['weekly', time_parsed[2], FALL_2016_END, 'su']
         event = create_event(uid, dtstart, dtend, location, rule, summary)
         cal.add_component(event)
         uid += 1
-    cal["X-WR-TIMEZONE"] = "America/Los_Angeles"
+    cal.add('X-WR-TIMEZONE', "America/Los_Angeles")
     path = os.path.expanduser("~/Desktop/scheduleTEST.ics")
     write_to_file(cal, path)
 
