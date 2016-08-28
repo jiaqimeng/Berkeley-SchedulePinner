@@ -20,9 +20,6 @@ def create_event(uid, dtstart, dtend, location, rule, summary):
     event.add('dtend', dtend)
     event['location'] = location
     event['summary'] = summary
-    print(location)
-    print(summary)
-    print(rule)
     event.add('rrule', create_event_rule(rule[0], rule[1], rule[2], rule[3]))
     return event
 
@@ -121,9 +118,9 @@ def parse_time(time):
     return (dtstart, dtend, weekdays)
 
 def parse_hour_minute(t):
-    am_pm = t[1][len(t)-2:len(t)]
+    am_pm = t[1][len(t[1])-2:len(t[1])]
     hour, minutes = round_time(int(t[0]), int(t[1][0:2]))
-    if am_pm == "pm" and hour != 12:
+    if am_pm == "pm" and hour < 12:
         hour += 12
     return (hour, minutes)
 
@@ -160,8 +157,3 @@ def main():
     write_to_file(cal, path)
 
 main()
-
-
-# TO DO: iteratively add events to calendar
-# for ... in events:
-#       cal.add_component(createEvent(...))
