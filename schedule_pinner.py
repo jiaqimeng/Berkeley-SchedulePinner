@@ -1,14 +1,15 @@
-from icalendar import Calendar, Event, Timezone, TimezoneStandard, TimezoneDaylight;
+from icalendar import Calendar, Event, Timezone, TimezoneStandard, TimezoneDaylight
 from dateutil import *
 import re, bs4, os, datetime
 
-# return a .ics formatted string
+# change the following numbers in every semester
 FALL_2016_END = datetime.datetime(2016, 12, 3, 0, 0, 0)
 FALL_2016_START_YEAR = 2016
 FALL_2016_START_MONTH = 8
 FALL_2016_START_DAY = 23 # this is intended set to be 1 day less than instruction date
 PRODUCT_ID = '-//M & Z Product//Berkeley iCal//EN'
 
+# abbreviation lookup
 all_abbr = {
     "Aerospace Studies": "AEROSPC",
     "African American Studies": "AFRICAM",
@@ -194,11 +195,11 @@ all_abbr = {
     "Yiddish": "YIDDISH",
 }
 
-
+# Display the calendar in a friendly format
 def display(cal):
     return cal.to_ical().replace('\r\n', '\n').strip()
 
-
+# Create the event based on several factors
 def create_event(uid, dtstart, dtend, location, rule, summary):
     event = Event()
     event['uid'] = uid
@@ -209,12 +210,12 @@ def create_event(uid, dtstart, dtend, location, rule, summary):
     event.add('rrule', create_event_rule(rule[0], rule[1], rule[2], rule[3]))
     return event
 
-
+# Create the event rule, this function is currently only called by create_event(...)
 def create_event_rule(frequency, byday, until, weekdaystarts):
     return {'freq': frequency, 'byday': byday,
             'until': until, 'WKST': weekdaystarts}
 
-
+# Set up the default timezone, which is USA/LA, and the daylight saving start time and end time.
 def create_default_timezone():
     timezone = Timezone()
     timezone['TZID'] = 'America/Los_Angeles'
@@ -238,12 +239,7 @@ def create_default_timezone():
     timezone['X-LIC-LOCATION'] = 'America/Los_Angeles'
     return timezone
 
-
-# To do
-def add_name_to_cal(event, name):
-    return
-
-
+# Scrap data from the .htm file and put it into dictionary format.
 def scrap_data():
     soup = bs4.BeautifulSoup(open("Schedule Planner.htm").read().replace('\n', ''), 'html.parser')
     schedule_table_body = soup.find("div", class_="current-schedule") \
@@ -280,14 +276,14 @@ def scrap_data():
             courses[sub_abbr + " " + number + " " + component] = this_course
     return courses
 
-
+# Get abbreviation of all subjects, the abbreviation lookup is on the top of this file.
 def get_abbr(subject):
     if subject in all_abbr:
         return all_abbr[subject]
     else:
         return subject
 
-
+# Parse raw time string into a tuple which contains dtstart, dtend and weekdays
 def parse_time(time):
     contents = time.split()
     weekdays = []
@@ -317,9 +313,10 @@ def parse_time(time):
                                 t_start_parsed[0], t_start_parsed[1], 0)
     dtend = datetime.datetime(t_start_adjusted.year, t_start_adjusted.month, t_start_adjusted.day,
                               t_end_parsed[0], t_end_parsed[1], 0)
+    # dtstart and dtend are datetime classes. weekdays is a list of string, i.e ['mo', 'tu', 'we'...]
     return (dtstart, dtend, weekdays)
 
-
+# Turn 12-hour format into 24-hour format. This function is currently only called from parse_time(...)
 def parse_hour_minute(t):
     am_pm = t[1][len(t[1]) - 2:len(t[1])]
     hour, minutes = round_time(int(t[0]), int(t[1][0:2]))
@@ -327,6 +324,7 @@ def parse_hour_minute(t):
         hour += 12
     return (hour, minutes)
 
+# Map weekday string to number. This function is currently only called from parse_time(...)
 def weekday_to_num(weekdaystring):
     if weekdaystring == "mo":
         return 0
@@ -339,6 +337,7 @@ def weekday_to_num(weekdaystring):
     if weekdaystring == "fr":
         return 4
 
+# Round minutes into nearse 5th, i.e 8:59am to 9:00am, 5:29pm to 5:30pm, 8:45am remains the same.
 def round_time(hour, minutes):
     minutes = (minutes + 1) / 5 * 5
     if minutes == 60:
@@ -346,13 +345,14 @@ def round_time(hour, minutes):
         minutes = 0
     return (hour, minutes)
 
+# Get next weekday starting from date d. Return a datetime class.
 def next_weekday(d, weekday):
     days_ahead = weekday - d.weekday()
     if days_ahead <= 0: # Target day already happened this week
         days_ahead += 7
     return d + datetime.timedelta(days_ahead)
 
-
+# write the calendar to .ics file.
 def write_to_file(calendar, path):
     f = open(path, "w")
     f.write(calendar.to_ical())
