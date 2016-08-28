@@ -1,7 +1,7 @@
 import bs4
 import re
 
-soup = bs4.BeautifulSoup(open("Schedule Planner.html").read().replace('\n', ''), 'html.parser')
+soup = bs4.BeautifulSoup(open("Schedule Planner.htm").read().replace('\n', ''), 'html.parser')
 schedule_table_body = soup.find("div", class_="current-schedule")\
                           .find("table", class_="section-detail-grid")\
                           .find("tbody")
@@ -31,6 +31,6 @@ for tr in schedule_table_body.children:
         # construct object
         this_course = {"subject": subject, "number": number, "component": component, "instructor": instructor,
                        "time": time, "location": location, "status": status, "unit": unit}
-        courses[subject + " " + number] = this_course
+        courses[subject + " " + number + " " + component] = this_course
 
 print(courses)
