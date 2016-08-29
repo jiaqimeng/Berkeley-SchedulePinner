@@ -273,16 +273,22 @@ def scrap_data():
             if instr_div:
                 instructor = instr_div.string.strip()
             else:
-                instructor = "N/A"
+                instructor = ""
             # detail - time and location
             detail_div = tr.contents[15].find('div')
             if detail_div:
                 detail = detail_div.string.strip()
             else:
-                detail = "N/A"
-            m = re.match("^(.*) \- (.*)$", detail)
-            time = m.group(1)  # TTh 9:30am - 10:59am
-            location = m.group(2)  # Dwinelle 155
+                detail = ""
+            # handle edge case
+            dashs = detail.count('-')
+            if dashs != 2:
+                time = detail
+                location = ""
+            else:
+                m = re.match("^(.*) \- (.*)$", detail)
+                time = m.group(1)  # TTh 9:30am - 10:59am
+                location = m.group(2)  # Dwinelle 155
             unit = tr.contents[17].string.strip()  # num in string format
             # construct object
             this_course = {"subject": subject, "number": number, "component": component, "instructor": instructor,
