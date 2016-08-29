@@ -1,6 +1,6 @@
 from icalendar import Calendar, Event, Timezone, TimezoneStandard, TimezoneDaylight
 from dateutil import *
-import re, bs4, os, datetime
+import re, bs4, os, datetime, sys
 
 # change the following numbers in every semester
 FALL_2016_END = datetime.datetime(2016, 12, 3, 0, 0, 0)
@@ -245,6 +245,8 @@ def create_default_timezone():
 # Scrap data from the .htm file and put it into dictionary format.
 def scrap_data():
     current_dir = os.getcwd() + "/"
+    if getattr(sys, 'frozen', False):
+        current_dir = os.path.dirname(sys.executable) + "/"
     try:
         html = open(current_dir + "Schedule Planner.html")
     except IOError:
@@ -389,6 +391,8 @@ def main():
         uid += 1
     cal.add('X-WR-TIMEZONE', "America/Los_Angeles")
     path = os.getcwd() + "/FA16 Schedule.ics"
+    if getattr(sys, 'frozen', False):
+        path = os.path.dirname(sys.executable) + "/FA16 Schedule.ics"
     write_to_file(cal, path)
 
 
