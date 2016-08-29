@@ -244,7 +244,15 @@ def create_default_timezone():
 
 # Scrap data from the .htm file and put it into dictionary format.
 def scrap_data():
-    soup = bs4.BeautifulSoup(open("Schedule Planner.htm").read().replace('\n', ''), 'html.parser')
+    try:
+        html = open("Schedule Planner.html")
+    except IOError:
+        try: 
+            html = open("Schedule Planner.htm")
+        except IOError:
+            print("Unexpected error: Could not find Schedule Planner file")
+            raise
+    soup = bs4.BeautifulSoup(html.read().replace('\n', ''), 'html.parser')
     schedule_table_body = soup.find("div", class_="current-schedule") \
         .find("table", class_="section-detail-grid") \
         .find("tbody")
