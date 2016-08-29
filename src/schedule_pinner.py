@@ -45,6 +45,7 @@ all_abbr = {
     "Business Admin-Undergrad": "UGBA",
     "Catalan": "CATALAN",
     "Celtic Studies": "CELTIC",
+    "Chemical Engineering": "CHM ENG",
     "Chemical & Biomolecular Engineering": "CHM ENG",
     "Chemistry": "CHEM",
     "Chicano Studies": "CHICANO",
