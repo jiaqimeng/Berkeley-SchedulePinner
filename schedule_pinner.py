@@ -244,11 +244,12 @@ def create_default_timezone():
 
 # Scrap data from the .htm file and put it into dictionary format.
 def scrap_data():
+    current_dir = os.getcwd() + "/"
     try:
-        html = open("Schedule Planner.html")
+        html = open(current_dir + "Schedule Planner.html")
     except IOError:
         try: 
-            html = open("Schedule Planner.htm")
+            html = open(current_dir + "Schedule Planner.htm")
         except IOError:
             print("Unexpected error: Could not find Schedule Planner file")
             raise
@@ -387,7 +388,7 @@ def main():
         cal.add_component(event)
         uid += 1
     cal.add('X-WR-TIMEZONE', "America/Los_Angeles")
-    path = os.path.expanduser("~/Desktop/scheduleTEST.ics")
+    path = os.getcwd() + "/FA16 Schedule.ics"
     write_to_file(cal, path)
 
 
