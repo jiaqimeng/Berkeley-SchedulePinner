@@ -1,6 +1,6 @@
 from icalendar import Calendar, Event, Timezone, TimezoneStandard, TimezoneDaylight
 from dateutil import *
-import re, bs4, os, datetime, sys
+import re, os, datetime, sys, json
 
 # change the following numbers in every semester
 FALL_2016_END = datetime.datetime(2016, 12, 3, 0, 0, 0)
@@ -9,195 +9,6 @@ FALL_2016_START_MONTH = 8
 FALL_2016_START_DAY = 23 # this is intended set to be 1 day less than instruction date
 PRODUCT_ID = '-//M & Z Product//Berkeley iCal//EN'
 
-# abbreviation lookup
-all_abbr = {
-    "Aerospace Studies": "AEROSPC",
-    "African American Studies": "AFRICAM",
-    "Agricultural and Resource Economics": "A,RESEC",
-    "American Studies": "AMERSTD",
-    "Ancient History and Mediterranean Archaeology": "AHMA",
-    "Anthropology": "ANTHRO",
-    "Applied Science and Technology": "AST",
-    "Arabic": "ARABIC",
-    "Architecture": "ARCH",
-    "Armenian": "ARMENI",
-    "Art, History of": "HISTART",
-    "Art Practice": "ART",
-    "Asian American Studies": "ASAMST",
-    "Asian Studies": "ASIANST",
-    "Astronomy": "ASTRON",
-    "Bengali": "BANGLA",
-    "Bibliography": "BIBLIOG",
-    "Bioengineering": "BIO ENG",
-    "Biology": "BIOLOGY",
-    "Biophysics": "BIOPHY",
-    "Bosnian, Croatian, Serbian": "BOSCRSR",
-    "Buddhist Studies": "BUDDSTD",
-    "Bulgarian": "BULGARI",
-    "Burmese": "BURMESE",
-    "Business Administration, Evening/Weekend Masters": "EWMBA",
-    "Business Administration, Executive Master": "XMBA",
-    "Business Administration, Master": "MBA",
-    "Business Admin-Master": "MBA",
-    "Business Administration, PhD": "PHDBA",
-    "Business Admin-PhD": "PHDBA",
-    "Business Administration, Undergraduate": "UGBA",
-    "Business Admin-Undergrad": "UGBA",
-    "Catalan": "CATALAN",
-    "Celtic Studies": "CELTIC",
-    "Chemical Engineering": "CHM ENG",
-    "Chemical & Biomolecular Engineering": "CHM ENG",
-    "Chemistry": "CHEM",
-    "Chicano Studies": "CHICANO",
-    "Chinese": "CHINESE",
-    "City and Regional Planning": "CY PLAN",
-    "Civil and Environmental Engineering": "CIV ENG",
-    "Classics": "CLASSIC",
-    "Cognitive Science": "COG SCI",
-    "College Writing Program": "COLWRIT",
-    "Comparative Biochemistry": "COMPBIO",
-    "Comparative Literature": "COM LIT",
-    "Computational Biology": "CMPBIO",
-    "Computer Science": "COMPSCI",
-    "Creative Writing": "CRWRIT",
-    "Critical Theory Graduate Group": "CRIT TH",
-    "Cuneiform": "CUNEIF",
-    "Czech": "CZECH",
-    "Danish": "DANISH",
-    "Data Science": "DATASCI",
-    "Demography": "DEMOG",
-    "Design Innovation": "DES INV",
-    "Development Engineering": "DEV ENG",
-    "Development Practice": "DEVP",
-    "Development Studies": "DEV STD",
-    "Dutch": "DUTCH",
-    "Earth and Planetary Science": "EPS",
-    "East Asian Languages and Cultures": "EA LANG",
-    "Economics": "ECON",
-    "Education": "EDUC",
-    "Egyptian": "EGYPT",
-    "Electrical Engineering and Computer Sciences": "EECS",
-    "Electrical Engineering": "EL ENG",
-    "Energy and Resources Group": "ENE,RES",
-    "Engineering": "ENGIN",
-    "English": "ENGLISH",
-    "Environmental Design": "ENV DES",
-    "Environmental Economics and Policy": "ENVECON",
-    "Environmental Science, Policy, and Management": "ESPM",
-    "Environmental Sciences": "ENV SCI",
-    "Ethnic Studies": "ETH STD",
-    "Ethnic Studies Graduate Group": "ETH GRP",
-    "European Studies": "EUST",
-    "Filipino": "FILIPN",
-    "Film and Media": "FILM",
-    "Financial Engineering": "MFE",
-    "Finnish": "FINNISH",
-    "Folklore": "FOLKLOR",
-    "French": "FRENCH",
-    "Gender and Women's Studies": "GWS",
-    "Geography": "GEOG",
-    "German": "GERMAN",
-    "Global Metropolitan Studies": "GMS",
-    "Global Poverty and Practice": "GPP",
-    "Graduate Student Professional Development Program": "GSPDP",
-    "Greek": "GREEK",
-    "Health and Medical Sciences": "HMEDSCI",
-    "Hebrew": "HEBREW",
-    "Hindi-Urdu": "HIN-URD",
-    "History": "HISTORY",
-    "Hungarian": "HUNGARI",
-    "Icelandic": "ICELAND",
-    "Indigenous Languages of Americas": "ILA",
-    "Industrial Engineering and Operations Research": "IND ENG",
-    "Information": "INFO",
-    "Integrative Biology": "INTEGBI",
-    "Interdisciplinary Studies Field Major": "ISF",
-    "International and Area Studies": "IAS",
-    "Iranian": "IRANIAN",
-    "Italian Studies": "ITALIAN",
-    "Japanese": "JAPAN",
-    "Jewish Studies": "JEWISH",
-    "Journalism": "JOURN",
-    "Khmer": "KHMER",
-    "Korean": "KOREAN",
-    "Landscape Architecture": "LD ARCH",
-    "Language Proficiency Program": "LAN PRO",
-    "Latin American Studies": "LATAMST",
-    "Latin": "LATIN",
-    "Legal Studies": "LEGALST",
-    "Lesbian Gay Bisexual Transgender Studies": "LGBT",
-    "Letters and Science": "L&S",
-    "Library and Information Studies": "LINFOST",
-    "Linguistics": "LINGUIS",
-    "Malay/Indonesian": "MALAY/I",
-    "Materials Science and Engineering": "MAT SCI",
-    "Mathematics": "MATH",
-    "Mechanical Engineering": "MEC ENG",
-    "Media Studies": "MEDIAST",
-    "Medieval Studies": "MED ST",
-    "Middle Eastern Studies": "M E STU",
-    "Military Affairs": "MIL AFF",
-    "Military Science": "MIL SCI",
-    "Molecular and Cell Biology": "MCELLBI",
-    "Mongolian": "MONGOLN",
-    "Music": "MUSIC",
-    "Nanoscale Science and Engineering": "NSE",
-    "Native American Studies": "NATAMST",
-    "Natural Resources": "NAT RES",
-    "Naval Science": "NAV SCI",
-    "Near Eastern Studies": "NE STUD",
-    "Neuroscience": "NEUROSC",
-    "New Media": "NWMEDIA",
-    "Norwegian": "NORWEGN",
-    "Nuclear Engineering": "NUC ENG",
-    "Nutritional Sciences and Toxicology": "NUSCTX",
-    "Optometry": "OPTOM",
-    "Peace and Conflict Studies": "PACS",
-    "Persian": "PERSIAN",
-    "Philosophy": "PHILOS",
-    "Physical Education": "PHYS ED",
-    "Physics": "PHYSICS",
-    "Plant and Microbial Biology": "PLANTBI",
-    "Polish": "POLISH",
-    "Political Economy": "POLECON",
-    "Political Science": "POL SCI",
-    "Portuguese": "PORTUG",
-    "Psychology": "PSYCH",
-    "Public Affairs": "PUB AFF",
-    "Public Health": "PB HLTH",
-    "Public Policy": "PUB POL",
-    "Punjabi": "PUNJABI",
-    "Religious Studies": "RELIGST",
-    "Rhetoric": "RHETOR",
-    "Romanian": "ROMANI",
-    "Russian": "RUSSIAN",
-    "Sanskrit": "SANSKR",
-    "Scandinavian": "SCANDIN",
-    "Science and Mathematics Education": "SCMATHE",
-    "Science and Technology Studies": "STS",
-    "Semitics": "SEMITIC",
-    "Slavic Languages and Literatures": "SLAVIC",
-    "Social Welfare": "SOC WEL",
-    "Sociology": "SOCIOL",
-    "South and Southeast Asian Studies": "S,SEASN",
-    "South Asian": "S ASIAN",
-    "Southeast Asian": "SEASIAN",
-    "Spanish": "SPANISH",
-    "Special Education": "EDUCSPE",
-    "Statistics": "STAT",
-    "Swedish": "SWEDISH",
-    "Tamil": "TAMIL",
-    "Telugu": "TELUGU",
-    "Thai": "THAI",
-    "Theater, Dance, and Performance Studies": "THEATER",
-    "Tibetan": "TIBETAN",
-    "Turkish": "TURKISH",
-    "Undergraduate Interdisciplinary Studies": "UGIS",
-    "Vietnamese": "VIETNMS",
-    "Vision Science": "VIS SCI",
-    "Visual Studies": "VIS STD",
-    "Yiddish": "YIDDISH",
-}
 
 # Display the calendar in a friendly format
 def display(cal):
@@ -256,53 +67,36 @@ def scrap_data():
         except IOError:
             print("Unexpected error: Could not find Schedule Planner file")
             raise
-    soup = bs4.BeautifulSoup(html.read().replace('\n', ''), 'html.parser')
-    schedule_table_body = soup.find("div", class_="current-schedule") \
-        .find("table", class_="section-detail-grid") \
-        .find("tbody")
+    m = re.findall('jsonData = (.*?);\s*Scheduler.initialize', html.read().replace('\n', ''))
+    data = json.loads(m[0])
     courses = {}
-    for tr in schedule_table_body.children:
-        if isinstance(tr, bs4.element.Tag):
-            status = tr.contents[5].string.strip()
-            subject = tr.contents[7].string.strip()
-            # Get subject abbr
-            sub_abbr = get_abbr(subject)
-            number = tr.contents[9].string.strip()
-            component = tr.contents[11].string.strip()
-            # instructor
-            instr_div = tr.contents[13].find('div')
-            if instr_div:
-                instructor = instr_div.string.strip()
-            else:
-                instructor = ""
-            # detail - time and location
-            detail_div = tr.contents[15].find('div')
-            if detail_div:
-                detail = detail_div.string.strip()
-            else:
-                detail = ""
-            # handle edge case
-            dashs = detail.count('-')
-            if dashs != 2:
-                time = detail
-                location = ""
-            else:
-                m = re.match("^(.*) \- (.*)$", detail)
-                time = m.group(1)  # TTh 9:30am - 10:59am
-                location = m.group(2)  # Dwinelle 155
-            unit = tr.contents[17].string.strip()  # num in string format
-            # construct object
-            this_course = {"subject": subject, "number": number, "component": component, "instructor": instructor,
-                           "time": time, "location": location, "status": status, "unit": unit}
-            courses[sub_abbr + " " + number + " " + component] = this_course
+    for course in data['currentSectionData']:
+        subject = course['subjectId']
+        number = course['course']
+        component = course['component']
+        section = course['sectionNumber']
+        if (len(course['instructor'])) == 0:
+            instructor = ""
+        else:
+            instructor = course['instructor'][0]['id']
+        meetings = []
+        for meeting in course['meetings']:
+            this_meeting = {
+                "days" : meeting['days'],
+                "start_time" : meeting['startTime'],
+                "end_time" : meeting['endTime'],
+                "location" : meeting['location'],
+                "start_date" : meeting['startDate'],
+                "end_date" : meeting['endDate']
+            }
+            meetings.append(this_meeting)
+        # construct object
+        this_course = {"subject": subject, "number": number, "component": component, "instructor": instructor,
+                        "meetings": meetings}
+        courses[subject + " " + number + " " + component] = this_course
+        print(courses)
     return courses
-
-# Get abbreviation of all subjects, the abbreviation lookup is on the top of this file.
-def get_abbr(subject):
-    if subject in all_abbr:
-        return all_abbr[subject]
-    else:
-        return subject
+    
 
 # Parse raw time string into a tuple which contains dtstart, dtend and weekdays
 def parse_time(time):
