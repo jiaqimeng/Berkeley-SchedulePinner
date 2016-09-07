@@ -1,9 +1,9 @@
 from icalendar import Calendar, Event, Timezone, TimezoneStandard, TimezoneDaylight
-from dateutil import *
-import re, os, datetime, sys, json
+from dateutil import parser
+import re, os, datetime, sys, json, pytz
 
 # change the following numbers in every semester
-FALL_2016_END = datetime.datetime(2016, 12, 3, 0, 0, 0)
+# FALL_2016_END = datetime.datetime(2016, 12, 3, 0, 0, 0)
 FALL_2016_START_YEAR = 2016
 FALL_2016_START_MONTH = 8
 FALL_2016_START_DAY = 23 # this is intended set to be 1 day less than instruction date
@@ -94,78 +94,38 @@ def scrap_data():
         this_course = {"subject": subject, "number": number, "component": component, "instructor": instructor,
                         "meetings": meetings}
         courses[subject + " " + number + " " + component] = this_course
-        print(courses)
     return courses
-    
 
-# Parse raw time string into a tuple which contains dtstart, dtend and weekdays
-def parse_time(time):
-    contents = time.split()
-    weekdays = []
-    contents_weekdays = contents[0]
-    for i in range(len(contents_weekdays)):
-        if contents_weekdays[i] == 'T':
-            if i < len(contents_weekdays) - 1 and contents_weekdays[i + 1] == 'h':
-                weekdays.append('th')
+def parse_weekdays(weekdays):
+    weekdays_parsed = []
+    for i in range(len(weekdays)):
+        if weekdays[i] == 'T':
+            if i < len(weekdays) - 1 and weekdays[i + 1] == 'h':
+                weekdays_parsed.append('th')
             else:
-                weekdays.append('tu')
-        if contents_weekdays[i] == 'M':
-            weekdays.append('mo')
-        if contents_weekdays[i] == 'W':
-            weekdays.append('we')
-        if contents_weekdays[i] == 'F':
-            weekdays.append('fr')
-    t_start = contents[1].split(':')
-    t_end = contents[3].split(':')
-    t_start_parsed = parse_hour_minute(t_start)
-    t_end_parsed = parse_hour_minute(t_end)
-    t_start_adjusted = datetime.date(2070, 1, 1)
-    for i in weekdays:
-        temp = next_weekday(datetime.date(FALL_2016_START_YEAR, FALL_2016_START_MONTH, FALL_2016_START_DAY), weekday_to_num(i))
-        if temp < t_start_adjusted:
-            t_start_adjusted = temp
-    dtstart = datetime.datetime(t_start_adjusted.year, t_start_adjusted.month, t_start_adjusted.day,
-                                t_start_parsed[0], t_start_parsed[1], 0)
-    dtend = datetime.datetime(t_start_adjusted.year, t_start_adjusted.month, t_start_adjusted.day,
-                              t_end_parsed[0], t_end_parsed[1], 0)
-    # dtstart and dtend are datetime classes. weekdays is a list of string, i.e ['mo', 'tu', 'we'...]
-    return (dtstart, dtend, weekdays)
-
-# Turn 12-hour format into 24-hour format. This function is currently only called from parse_time(...)
-def parse_hour_minute(t):
-    am_pm = t[1][len(t[1]) - 2:len(t[1])]
-    hour, minutes = round_time(int(t[0]), int(t[1][0:2]))
-    if am_pm == "pm" and hour < 12:
-        hour += 12
-    return (hour, minutes)
+                weekdays_parsed.append('tu')
+        if weekdays[i] == 'M':
+            weekdays_parsed.append('mo')
+        if weekdays[i] == 'W':
+            weekdays_parsed.append('we')
+        if weekdays[i] == 'F':
+            weekdays_parsed.append('fr')
+    return weekdays_parsed
 
 # Map weekday string to number. This function is currently only called from parse_time(...)
 def weekday_to_num(weekdaystring):
-    if weekdaystring == "mo":
-        return 0
-    if weekdaystring == "tu":
-        return 1
-    if weekdaystring == "we":
-        return 2
-    if weekdaystring == "th":
-        return 3
-    if weekdaystring == "fr":
-        return 4
+    wdict = {"mo": 0, "tu": 1, "we": 2, "th": 3, "fr": 4}
+    return wdict[weekdaystring]
 
 # Round minutes into nearse 5th, i.e 8:59am to 9:00am, 5:29pm to 5:30pm, 8:45am remains the same.
 def round_time(hour, minutes):
+    hour = int(hour)
+    minutes = int(minutes)
     minutes = (minutes + 1) / 5 * 5
     if minutes == 60:
         hour += 1
         minutes = 0
-    return (hour, minutes)
-
-# Get next weekday starting from date d. Return a datetime class.
-def next_weekday(d, weekday):
-    days_ahead = weekday - d.weekday()
-    if days_ahead <= 0: # Target day already happened this week
-        days_ahead += 7
-    return d + datetime.timedelta(days_ahead)
+    return datetime.time(hour, minutes)
 
 # write the calendar to .ics file.
 def write_to_file(calendar, path):
@@ -180,16 +140,28 @@ def main():
     cal.add('prodid', PRODUCT_ID)
     cal.add_component(create_default_timezone())
     uid = 1
+    pacific_time = pytz.timezone('America/Los_Angeles')
     for course, info in scrap_data().iteritems():
         summary = course
-        location = info["location"]
-        time_parsed = parse_time(info["time"])
-        dtstart = time_parsed[0]
-        dtend = time_parsed[1]
-        rule = ['weekly', time_parsed[2], FALL_2016_END, 'su']
-        event = create_event(uid, dtstart, dtend, location, rule, summary)
-        cal.add_component(event)
-        uid += 1
+        meetings = info["meetings"]
+        # location = info["meetings"]
+        if len(meetings) > 0:
+            main_meeting = meetings[0]
+            if not main_meeting["start_time"] or not main_meeting["end_time"]:
+                continue
+            location = main_meeting["location"]
+            weekdays = parse_weekdays(main_meeting["days"])
+            date_start, date_end = parser.parse(main_meeting["start_date"]), parser.parse(main_meeting["end_date"])
+            
+            tstart, tend = round_time(str(main_meeting["start_time"])[:-2], str(main_meeting["start_time"])[-2:]), round_time(str(main_meeting["end_time"])[:-2], str(main_meeting["end_time"])[-2:])
+            dtstart = pacific_time.localize(date_start.replace(hour = tstart.hour, minute = tstart.minute, tzinfo = None))
+            dtend = pacific_time.localize(date_start.replace(hour = tend.hour, minute = tend.minute, tzinfo = None))
+            date_end = pacific_time.localize(date_end.replace(hour = tend.hour, minute = tend.minute, tzinfo = None)) + datetime.timedelta(days = 1)
+
+            rule = ['weekly', weekdays, date_end, 'su']
+            event = create_event(uid, dtstart, dtend, location, rule, summary)
+            cal.add_component(event)
+            uid += 1
     cal.add('X-WR-TIMEZONE', "America/Los_Angeles")
     path = os.getcwd() + "/FA16 Schedule.ics"
     if getattr(sys, 'frozen', False):
