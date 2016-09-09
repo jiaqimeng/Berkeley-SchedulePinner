@@ -2,13 +2,7 @@ from icalendar import Calendar, Event, Timezone, TimezoneStandard, TimezoneDayli
 from dateutil import parser
 import re, os, datetime, sys, json, pytz
 
-# change the following numbers in every semester
-# FALL_2016_END = datetime.datetime(2016, 12, 3, 0, 0, 0)
-FALL_2016_START_YEAR = 2016
-FALL_2016_START_MONTH = 8
-FALL_2016_START_DAY = 23 # this is intended set to be 1 day less than instruction date
 PRODUCT_ID = '-//M & Z Product//Berkeley iCal//EN'
-
 
 # Display the calendar in a friendly format
 def display(cal):
@@ -56,14 +50,15 @@ def create_default_timezone():
 
 # Scrap data from the .htm file and put it into dictionary format.
 def scrap_data():
-    current_dir = os.getcwd() + "/"
-    if getattr(sys, 'frozen', False):
-        current_dir = os.path.dirname(sys.executable) + "/"
+    desktop_dir = os.path.expanduser("~/Desktop/")
+    # BELOW is for create in current dir.
+    # if getattr(sys, 'frozen', False):
+    #     current_dir = os.path.dirname(sys.executable) + "/"
     try:
-        html = open(current_dir + "Schedule Planner.html")
+        html = open(desktop_dir + "Schedule Planner.html")
     except IOError:
         try: 
-            html = open(current_dir + "Schedule Planner.htm")
+            html = open(desktop_dir + "Schedule Planner.htm")
         except IOError:
             print("Unexpected error: Could not find Schedule Planner file")
             raise
@@ -163,9 +158,14 @@ def main():
             cal.add_component(event)
             uid += 1
     cal.add('X-WR-TIMEZONE', "America/Los_Angeles")
-    path = os.getcwd() + "/FA16 Schedule.ics"
-    if getattr(sys, 'frozen', False):
-        path = os.path.dirname(sys.executable) + "/FA16 Schedule.ics"
+    path = os.path.expanduser("~/Desktop/FA16 Schedule.ics")
+
+    # BELOW is for create in current dir.
+
+    # path = os.getcwd() + "/FA16 Schedule.ics"
+    # if getattr(sys, 'frozen', False):
+    #     path = os.path.dirname(sys.executable) + "/FA16 Schedule.ics"
+
     write_to_file(cal, path)
 
 
