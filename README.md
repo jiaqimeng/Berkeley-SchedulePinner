@@ -13,10 +13,10 @@ Berkeley Schedule Pinner is an app that makes it easier to transfer the course s
 4. Go to [Calcentral -> My Academics]. 
 5. Click to unfold the Schedule Planner tab under Class Enrollment tab (on the right) <img src=https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/pics/Usage%20Pic%20%231.png width="250">
 6. Click the link "**Organize and preview your upcoming semester**", which will lead you to **Schedule Planner** website
-7. Save* the webpage as "**Webpage, complete**" (it is the default action, so you don't need to change it), and save this webpage to the same location where you just downloaded the schedulepinner app.<img src=https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/pics/Usage%20Pic%20%234.png width="250">
+7. Save* the webpage as "**Webpage, complete**" (it is the default action, so you don't need to change it), and save this webpage to your desktop.<img src=https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/pics/Usage%20Pic%20%234.png width="250">
 *for Mac users, press ⌘+S; for Windows users, press ctrl+S 
-8. Double click the decompressed file, and then you can see a new file called "**FA16 Schedule.ics**" generaterd. <img src=https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/pics/Usage%20Pic%20%233.png width="100">
-9. Double click this .ics file and add it into one of your icloud calendar.
+8. Double click the decompressed file, and then you can see a new file called "**FA16 Schedule.ics**" generaterd on the desktop. <img src=https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/pics/Usage%20Pic%20%233.png width="100">
+9. Double click this .ics file and add it into one of your icloud calendars.
 10. Now you can find the schedule on your computer (and possibly on your iphone if you are using a Mac)
 
 
