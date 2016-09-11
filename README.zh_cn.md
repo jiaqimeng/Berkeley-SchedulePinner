@@ -6,8 +6,8 @@ Berkeley Schedule Pinner是一款可以将你的在伯克利的课程添加到�
 ### 使用方法:
 
 1. 根据你的电脑系统，从dist文件夹中下载适用于Mac版本的schedulepinner_mac.tar.gz或者适用于Windows的schedulepinner_win_x86.zip。
-2. 下载后双击解压。解压后得到文件，如果你在用Mac，得到的是这个文件
-<img src=https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/pics/Usage%20Pic%20%232.png width="100">，在Windows上你会得到一个文件夹。
+2. 下载后双击解压。解压后得到文件，如果你在用Mac，得到的文件夹里面有这样的文件
+<img src=https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/pics/Usage%20Pic%20%232.png width="100">，在Windows上你会得到一个包含许多文件的文件夹。
 3. 到你的Calcentral网站里的My Academics [Calcentral -> My Academics]。
 4. 在右侧找到Schedule Planner。 <img src=https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/pics/Usage%20Pic%20%231.png width="250">
 5. 点击"**Organize and preview your upcoming semester**"，进入**Schedule Planner**网站
