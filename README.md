@@ -7,8 +7,8 @@ Berkeley Schedule Pinner is an app that makes it easier to transfer the course s
 ### Usage:
 
 1. Download a version in [dist] folder based on your platform (Mac/Windows).
-2. Double click to decompress it. On Mac you will find an executable file with a black icon as shown below
-<img src=https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/pics/Usage%20Pic%20%232.png width="100">, on Windows you will find a folder.
+2. Double click to decompress it. On Mac you will find a folder with an executable file with a black icon as shown below
+<img src=https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/pics/Usage%20Pic%20%232.png width="100">.
 3. Go to [Calcentral -> My Academics]. 
 4. Click to unfold the Schedule Planner tab under Class Enrollment tab (on the right) <img src=https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/pics/Usage%20Pic%20%231.png width="250">
 5. Click the link "**Organize and preview your upcoming semester**", which will lead you to **Schedule Planner** website
