@@ -158,7 +158,8 @@ def main():
     cal.add('X-WR-TIMEZONE', "America/Los_Angeles")
     print("Please choose your saving location")
     Tk().withdraw()
-    path = askdirectory() + "/FA16 Schedule.ics"
+    path = askdirectory() + "/My Schedule.ics"
     write_to_file(cal, path)
+    print("Calendar saved at " + path)
 
 main()
