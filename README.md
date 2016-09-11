@@ -2,7 +2,7 @@
 Berkeley Schedule Pinner is an app that makes it easier to transfer the course schedule from Calcentral to your personal calendar. Since it is still in beta test, please excuse us for bugs we made and please report to us any bug you find.
 ##### README is also available in [简体中文]
 
-#### Supported Platforms: Mac OS, Windows
+### Supported Platforms: Mac OS, Windows
 
 ### Usage:
 
@@ -19,7 +19,7 @@ Berkeley Schedule Pinner is an app that makes it easier to transfer the course s
 9. Now you can find the schedule on your computer (and possibly on your iphone if you are using a Mac)
 
 
-#### Report a bug
+### Report a bug
 - Please send an email with your Schedule Planner webpage to richardmeng47@gmail.com
 
 [Calcentral -> My Academics]: <https://calcentral.berkeley.edu/academics>
