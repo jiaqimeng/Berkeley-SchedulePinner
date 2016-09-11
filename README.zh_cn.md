@@ -14,7 +14,7 @@ Berkeley Schedule Pinner是一款可以将你的在伯克利的课程添加到�
 6. 保存* 网页为"**Webpage, complete**"格式(默认就是这个格式)，safari保存为"Page Source"，保存到你方便的位置。
 <br /><img src=https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/pics/Usage%20Pic%20%234.png width="250">
 <br />*保存网页方法：Mac用户按下 ⌘+S; Windows用户按 ctrl+S 
-7. 双击在第一步解压的文件， 正常情况下会有一个文件管理器弹出两次，第一次选择你在上一步保存的.htm/.html文件，第二次选择你想保存课程表的位置。选择完毕后会有一个课程表文件生成。 <br /><img src=https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/pics/Usage%20Pic%20%233.png width="100">
+7. 双击在第一步解压的文件， 正常情况下会有一个文件管理器弹出两次，第一次选择你在上一步保存的.htm/.html文件，第二次选择你想保存课程表的位置。选择完毕后会有一个课程表文件生成。 <br /><https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/pics/Usage%20Pic%20%230.png>
 8. 双击.ics文件添加日历到icloud中。
 9. 日历添加完成，如果你的手机也用icloud，你可以在你手机中看到这个日历。
 
