@@ -52,10 +52,7 @@ def create_default_timezone():
 
 # Scrap data from the .htm file and put it into dictionary format.
 def scrap_data():
-    #desktop_dir = os.path.expanduser("~/Desktop/")
-    # BELOW is for create in current dir.
-    # if getattr(sys, 'frozen', False):
-    #     current_dir = os.path.dirname(sys.executable) + "/"
+    print("Please choose your Schedule Planner.htm or Schedule Planner.html")
     Tk().withdraw()
     input_file = askopenfilename()
     try:
@@ -132,7 +129,6 @@ def write_to_file(calendar, path):
     f.write(calendar.to_ical())
     f.close()
 
-
 def main():
     cal = Calendar()
     cal['version'] = '2.0'
@@ -151,28 +147,18 @@ def main():
             location = main_meeting["location"]
             weekdays = parse_weekdays(main_meeting["days"])
             date_start, date_end = parser.parse(main_meeting["start_date"]), parser.parse(main_meeting["end_date"])
-            
             tstart, tend = round_time(str(main_meeting["start_time"])[:-2], str(main_meeting["start_time"])[-2:]), round_time(str(main_meeting["end_time"])[:-2], str(main_meeting["end_time"])[-2:])
             dtstart = pacific_time.localize(date_start.replace(hour = tstart.hour, minute = tstart.minute, tzinfo = None))
             dtend = pacific_time.localize(date_start.replace(hour = tend.hour, minute = tend.minute, tzinfo = None))
             date_end = pacific_time.localize(date_end.replace(hour = tend.hour, minute = tend.minute, tzinfo = None)) + datetime.timedelta(days = 1)
-
             rule = ['weekly', weekdays, date_end, 'su']
             event = create_event(uid, dtstart, dtend, location, rule, summary)
             cal.add_component(event)
             uid += 1
     cal.add('X-WR-TIMEZONE', "America/Los_Angeles")
-    
-    #path = os.path.expanduser("~/Desktop/FA16 Schedule.ics")
-
-    # BELOW is for create in current dir.
-
-    # path = os.getcwd() + "/FA16 Schedule.ics"
-    # if getattr(sys, 'frozen', False):
-    #     path = os.path.dirname(sys.executable) + "/FA16 Schedule.ics"
+    print("Please choose your saving location")
     Tk().withdraw()
     path = askdirectory() + "/FA16 Schedule.ics"
     write_to_file(cal, path)
-
 
 main()
