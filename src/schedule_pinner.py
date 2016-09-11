@@ -1,5 +1,7 @@
 from icalendar import Calendar, Event, Timezone, TimezoneStandard, TimezoneDaylight
 from dateutil import parser
+from Tkinter import Tk
+from tkFileDialog import askopenfilename, askdirectory
 import re, os, datetime, sys, json, pytz
 
 PRODUCT_ID = '-//M & Z Product//Berkeley iCal//EN'
@@ -50,15 +52,17 @@ def create_default_timezone():
 
 # Scrap data from the .htm file and put it into dictionary format.
 def scrap_data():
-    desktop_dir = os.path.expanduser("~/Desktop/")
+    #desktop_dir = os.path.expanduser("~/Desktop/")
     # BELOW is for create in current dir.
     # if getattr(sys, 'frozen', False):
     #     current_dir = os.path.dirname(sys.executable) + "/"
+    Tk().withdraw()
+    input_file = askopenfilename()
     try:
-        html = open(desktop_dir + "Schedule Planner.html")
+        html = open(input_file)
     except IOError:
         try: 
-            html = open(desktop_dir + "Schedule Planner.htm")
+            html = open(input_file)
         except IOError:
             print("Unexpected error: Could not find Schedule Planner file")
             raise
@@ -158,14 +162,16 @@ def main():
             cal.add_component(event)
             uid += 1
     cal.add('X-WR-TIMEZONE', "America/Los_Angeles")
-    path = os.path.expanduser("~/Desktop/FA16 Schedule.ics")
+    
+    #path = os.path.expanduser("~/Desktop/FA16 Schedule.ics")
 
     # BELOW is for create in current dir.
 
     # path = os.getcwd() + "/FA16 Schedule.ics"
     # if getattr(sys, 'frozen', False):
     #     path = os.path.dirname(sys.executable) + "/FA16 Schedule.ics"
-
+    Tk().withdraw()
+    path = askdirectory() + "/FA16 Schedule.ics"
     write_to_file(cal, path)
 
 
