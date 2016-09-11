@@ -1,5 +1,6 @@
 # Berkeley Schedule Pinner
 Berkeley Schedule Pinner是一款可以将你的在伯克利的课程添加到你的日历中的辅助软件
+##### README is also available in [English]
 
 ### 系统支持：Mac OS, Windows
 
@@ -19,7 +20,8 @@ Berkeley Schedule Pinner是一款可以将你的在伯克利的课程添加到�
 9. 日历添加完成，如果你的手机也用icloud，你可以在你手机中看到这个日历。
 
 
-#### 报告错误
+### 报告错误
 - 请附带你的Schedule Planner网页发送邮件到richardmeng47@gmail.com
 
 [Calcentral -> My Academics]: <https://calcentral.berkeley.edu/academics>
+[English]: <https://github.com/jiaqimeng/Berkeley-SchedulePinner/blob/master/README.md>
