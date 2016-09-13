@@ -4,6 +4,8 @@ Berkeley Schedule Pinner is an app that makes it easier to transfer the course s
 
 ### Supported Platforms: Mac OS, Windows
 
+### Unsupported Type of Students: Law School Graduates
+
 ### Usage:
 
 1. Download a version in [dist] folder based on your platform (Mac/Windows).
